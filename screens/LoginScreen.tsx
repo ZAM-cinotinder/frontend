@@ -67,6 +67,7 @@ export const LoginScreen = ({ navigation }: RootStackScreenProps<'Login'>) => {
               value={values.email} 
               style={styles.input}
               placeholder="Email"
+              textContentType="emailAddress"
             />
             <TextInput
               onChangeText={handleChange('password')}

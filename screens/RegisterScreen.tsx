@@ -74,6 +74,7 @@ export const RegisterScreen = ({ navigation }: RootStackScreenProps<'Register'>)
               value={values.email} 
               style={styles.input}
               placeholder="Email"
+              textContentType="emailAddress"
               error={Boolean(errors.email && touched.email)}
             />
             {errors.email && touched.email && <Text style={styles.error}>{errors.email}</Text>}
