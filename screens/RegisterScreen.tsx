@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     right: '0%',
     left: '0%',
     zIndex: -1,
+    opacity: 0.08,
     // width: '70%'
   },
   input: {

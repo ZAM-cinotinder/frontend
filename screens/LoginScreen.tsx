@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
     bottom: '-10%',
     right: '-15%',
     zIndex: -1,
+    opacity: 0.08,
     // width: '70%'
   },
   input: {
