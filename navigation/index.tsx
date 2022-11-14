@@ -22,6 +22,8 @@ import {LoginScreen} from '../screens/LoginScreen';
 import {RegisterScreen} from '../screens/RegisterScreen';
 import {ForgotPasswordScreen} from '../screens/ForgotPasswordScreen';
 import { useAuthentication } from '../hooks/useAuthentication';
+import {YourDogsListScreen} from '../screens/YourDogsListScreen';
+import {AddDogScreen} from '../screens/AddDogScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   const { user } = useAuthentication();
@@ -44,6 +46,7 @@ function UserStack({ colorScheme }: { colorScheme: ColorSchemeName }) {
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'login!' }} />
+      <Stack.Screen name="AddDogScreen" component={AddDogScreen} options={{ headerShown: false }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>
@@ -112,10 +115,10 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="YourDogsListScreen"
+        component={YourDogsListScreen}
         options={{
-          title: 'Tab Two',
+          title: 'yourDogsListScreen',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />

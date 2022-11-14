@@ -1,5 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
+
 
 // Optionally import the services that you want to use
 //import {...} from "firebase/auth";
@@ -25,3 +28,5 @@ const app = initializeApp(firebaseConfig);
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
 
 export const auth = getAuth(app);
+export const database = getDatabase(app);
+export const storage = getStorage(app);

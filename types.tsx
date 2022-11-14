@@ -6,6 +6,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {Dog, DogWithId} from './types/Dog';
 
 declare global {
   namespace ReactNavigation {
@@ -19,7 +20,9 @@ export type RootStackParamList = {
   NotFound: undefined;
   Login: undefined;
   Register: undefined;
+  YourDogsListScreen: undefined;
   ForgotPassword: undefined;
+  AddDogScreen: DogWithId | undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -30,6 +33,7 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 export type RootTabParamList = {
   TabOne: undefined;
   TabTwo: undefined;
+  YourDogsListScreen: undefined;
   Login: undefined;
   ForgotPassword: undefined;
 };

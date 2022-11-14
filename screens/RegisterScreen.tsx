@@ -1,8 +1,9 @@
 import {StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {  ref, set } from "firebase/database";
 
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
-import {auth} from '../constants/firebase';
+import {auth, database} from '../constants/firebase';
 
 import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth';
 import {Button, TextInput} from 'react-native-paper';
@@ -19,10 +20,18 @@ const SignupSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
 });
 
+
 export const RegisterScreen = ({ navigation }: RootStackScreenProps<'Register'>) => {
   const [user, setUser] = useState('');
   const [error, setError] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+
+  const pushToDatabase = (email:string,userId:string) =>{
+    const userInDatabase = {
+      email: email,
+    }
+    set(ref(database, 'users/' + userId), userInDatabase);
+  }
 
   const signUpIn = (email: string, password: string) => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -35,7 +44,8 @@ export const RegisterScreen = ({ navigation }: RootStackScreenProps<'Register'>)
             type: 'success',
             text1: 'Account created 🎉',
         });
-        // ...
+
+        pushToDatabase(email, user.uid);
       })
       .catch((error) => {
         const errorCode = error.code;
