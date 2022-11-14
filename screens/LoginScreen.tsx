@@ -67,6 +67,7 @@ export const LoginScreen = ({ navigation }: RootStackScreenProps<'Login'>) => {
               value={values.email} 
               style={styles.input}
               placeholder="Email"
+              textContentType="emailAddress"
             />
             <TextInput
               onChangeText={handleChange('password')}
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
     bottom: '-10%',
     right: '-15%',
     zIndex: -1,
+    opacity: 0.08,
     // width: '70%'
   },
   input: {
