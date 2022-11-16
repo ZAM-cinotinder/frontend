@@ -24,6 +24,7 @@ import {ForgotPasswordScreen} from '../screens/ForgotPasswordScreen';
 import { useAuthentication } from '../hooks/useAuthentication';
 import {YourDogsListScreen} from '../screens/YourDogsListScreen';
 import {AddDogScreen} from '../screens/AddDogScreen';
+import {SwipeDogsScreen} from '../screens/SwipeDogsScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   const { user } = useAuthentication();
@@ -47,6 +48,7 @@ function UserStack({ colorScheme }: { colorScheme: ColorSchemeName }) {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'login!' }} />
       <Stack.Screen name="AddDogScreen" component={AddDogScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SwipeDogsScreen" component={SwipeDogsScreen} options={{ headerShown: false }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>
@@ -93,26 +95,12 @@ function BottomTabNavigator() {
         }}
       />
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
-        })}
+        name="SwipeDogsScreen"
+        component={SwipeDogsScreen}
+        options={{
+          title: 'SwipeDogsScreen',
+          tabBarIcon: ({ color }) => <TabBarIcon name="linkedin" color={color} />,
+        }}
       />
       <BottomTab.Screen
         name="YourDogsListScreen"

@@ -1,6 +1,7 @@
-import {StyleSheet, TouchableOpacity, Image} from 'react-native';
-import {  ref, get } from "firebase/database";
+import { StyleSheet, Image, ImageStyle } from 'react-native';
+import {  ref, get, equalTo, orderByKey, startAt  } from "firebase/database";
 import { useDatabaseValue } from '@react-query-firebase/database';
+import { useQuery } from 'react-query';
 
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
@@ -12,44 +13,42 @@ import { useState } from 'react';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
+import { getDatabase, query, orderByChild } from "firebase/database";
 import Toast from 'react-native-toast-message';
 import {useAuthentication} from '../hooks/useAuthentication';
 import {Dog, Dogs} from '../types/Dog';
 
 
-export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDogsListScreen'>) => {
+export const MainSwipeDogsScreen = ({ navigation }: RootStackScreenProps<'MainSwipeDogsScreen'>) => {
     const { user } = useAuthentication();
     const [secureTextEntry, setSecureTextEntry] = useState(true);
-    const dbRef = ref(database, `users/${user?.uid ?? '*'}/Psy`);
-    const dogs = useDatabaseValue<Dogs>(["Psy", user?.uid], dbRef, {
-      subscribe: true,
-    });
-  
-    const renderDogCards = () =>{
-      if(!dogs?.data) return null;
-      
-      return Object.entries(dogs.data).map(([id, dog]) => (
-        <TouchableOpacity onPress={() => navigation.push('AddDogScreen', {...dog, id})} style={styles.dogCard} key={id}>
-          <View style={{flex: 1}}>
-            <Text style={styles.dogName}>{dog.Imie}, {dog.Rasa} {dog.Wiek}m</Text>
-            <Text style={styles.dogPlec}>{dog.Plec}</Text>
-            <Text style={styles.dogOpis}>{dog.opis}</Text>
-            <Text style={styles.dogVoivodeship}>{dog.voivodeship}</Text>
-      
-          </View>
-          <Image style={styles.dogImage} source={{uri: 'data:image/png;base64,' + dog.photo}}/>
-        </TouchableOpacity>
-      ));
-    }
+    const voivodeship = 'Lodz';
+    const dbRef = ref(database, `Psy/${voivodeship}`);
+    
+    const lastId = undefined;
+    // const x = query(dbRef, orderByKey(), ...(lastId ? [startAt(lastId)] : []));
+    const { isLoading, error, data } = useQuery({
+      queryKey: ['Psy'],
+      queryFn: () =>
+        query(dbRef, orderByKey(), ...(lastId ? [startAt(lastId)] : [])),
+    })
+    
+
 
     return (
-      <View style={styles.container}>
-          <Button mode="contained" onPress={() => navigation.push('AddDogScreen')} style={{marginBottom: 16}}>Add new dog</Button>
-          {renderDogCards()}
-          <Image source={require('../assets/psy/tmpspemxaxj.png')} style={styles.backgroundImg} />
-          {/* <Text style={styles.linkText}>{user}</Text>
-          <Text style={styles.linkText}>{error}</Text> */}
-      </View>
+        <View style={styles.container}>
+            <View style={styles.dogCard}>
+                <Image style={styles.mainCard as ImageStyle} source={require('')} />
+                <Text>, 26m {voivodeship}</Text>
+                <Text>Golden Retriever, very playful</Text>
+            </View>
+            <View style={styles.buttonPanel}>
+                <Button style={styles.mainScreenButton}> a</Button>
+                <Button style={styles.mainScreenButton}> b</Button>
+                <Button style={styles.mainScreenButton}> c</Button>
+                <Button style={styles.mainScreenButton}> f</Button>
+            </View>
+        </View>
     );
   }
   
@@ -57,8 +56,19 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
     container: {
       flex: 1,
       alignItems: 'center',
-      justifyContent: 'flex-start',
+      justifyContent: 'center',
       padding: 20,
+    },
+    buttonPanel:{
+        flexDirection: "row",
+        flexWrap: "wrap",
+    },
+    mainScreenButton: {
+        backgroundColor:'blue',
+        width:'50px',
+        height:'50px',
+        borderRadius: 25,
+        marginTop:20,
     },
     form: {
       // flex: 1,
@@ -94,37 +104,25 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
         flexDirection: "row",
         flexWrap: "wrap",
 
-        justifyContent: "space-between",
-        
         shadowColor: "#000",
         shadowOffset: {
           width: 0,
           height: 1,
         },
-        shadowOpacity: 0.22,
-        shadowRadius: 2.22,
-        
-        elevation: 3,
+        shadowOpacity: 0.20,
+        shadowRadius: 1.41,
+
+        elevation: 2,
     },
     dogName: {
         fontSize: 20,
         fontWeight: 'bold',
+        marginBottom: 5,
     },
-    dogOpis: {
-        fontSize: 16,
-        color: '#000',
-    },
-    dogVoivodeship: {
-      fontSize: 12,
-      color: '#000',
-      marginBottom: 5,
-      marginTop: -3,
-    },
-    dogPlec: {
+    dogInfo: {
         fontSize: 12,
         color: '#000',
         marginBottom: 5,
-        marginTop: -3,
     },
     input: {
       width: '100%',
@@ -156,5 +154,9 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
       color: '#2e78b7',
       marginBottom: 12,
     },
+    mainCard :{
+        width: '90%',
+        height: '300px',
+    }
   });
   

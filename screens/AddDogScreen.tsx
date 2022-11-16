@@ -2,6 +2,7 @@ import {StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {  ref, set } from "firebase/database";
 import { useDatabaseValue } from '@react-query-firebase/database';
 import { useQueryClient } from 'react-query';
+import * as ImagePicker from 'expo-image-picker';
 
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
@@ -19,6 +20,8 @@ import Toast from 'react-native-toast-message';
 import {useAuthentication} from '../hooks/useAuthentication';
 import {Dog} from '../types/Dog';
 
+import {Picker} from '@react-native-picker/picker';
+
 const AddDogScheme = Yup.object().shape({
   imie: Yup.string().required('Required'),
   plec: Yup.string().required('Required'),
@@ -31,49 +34,74 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
   const { user } = useAuthentication();
   const queryClient = useQueryClient()
   const Dog = route.params;
-    const pushToDatabase = (name:string,gender:string,breed:string,age:string) =>{
+  const [image, setImage] = useState(null);
+  const pushToDatabase = (name:string,gender:string,breed:string,age:string, description:string, wojewodztwo:string) =>{
 
-        Toast.show({
-            type: 'error',
-            text1: 'Błąd sesji',
-        });
-        if(!user) {return;}
+      Toast.show({
+          type: 'error',
+          text1: 'Błąd sesji',
+      });
+      if(!user) {return;}
 
-        const dogInDatabase: Dog = {
-          userId: user.uid,
-          Imie: name,
-          Plec: gender,
-          Rasa: breed,
-          Wiek: Number.parseInt(age)
-        }
+      const dogInDatabase: Dog = {
+        userId: user.uid,
+        Imie: name,
+        Plec: gender,
+        Rasa: breed,
+        Wiek: Number.parseInt(age),
+        photo: image ?? '',
+        opis: description,
+        voivodeship: wojewodztwo,
+      }
 
-        const dogId = Dog?.id ?? uuid();
-        queryClient.invalidateQueries(["Psy", user?.uid]);
+      const dogId = Dog?.id ?? uuid();
+      queryClient.invalidateQueries(["Psy", user?.uid]);
 
-        set(ref(database, `users/${user.uid}/Psy/${dogId}`), dogInDatabase);
-        set(ref(database, `Psy/Lodz/${dogId}`), dogInDatabase);
+      set(ref(database, `users/${user.uid}/Psy/${dogId}`), dogInDatabase);
+      set(ref(database, `Psy/Lodz/${dogId}`), dogInDatabase);
 
-        navigation.pop();
-        Toast.show({
-            type: 'success',
-            text1: 'Sukces',
-        });
+      navigation.pop();
+      Toast.show({
+          type: 'success',
+          text1: 'Sukces',
+      });
+  }
+
+  const addImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.3,
+      base64: true,
+    });
+
+    console.log(result);
+
+    // @ts-ignore
+    if (!result.canceled) {
+      // @ts-ignore
+      setImage(result.base64);
     }
+  }
 
   return (
     <View style={styles.container}>
       <Formik
         initialValues={{ 
             imie: Dog?.Imie ?? '', 
-            plec: Dog?.Plec ?? '', 
+            plec: Dog?.Plec ?? 'Pies', 
             rasa: Dog?.Rasa ?? '', 
-            wiek: String(Dog?.Wiek)
+            wiek: String(Dog?.Wiek),
+            opis: Dog?.opis ?? '', 
+            voivodeship: Dog?.voivodeship ?? 'Lodzkie',
         }}
-        onSubmit={({imie, plec, rasa, wiek}) => pushToDatabase(imie, plec ,rasa , wiek)}
+        onSubmit={({imie, plec, rasa, wiek, opis, voivodeship}) => pushToDatabase(imie, plec ,rasa , wiek, opis, voivodeship)}
         validationSchema={AddDogScheme}
         >
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
           <View style={styles.form}>
+            <Button mode='contained' onPress={addImage} >Add image</Button>
             <TextInput
               onChangeText={handleChange('imie')}
               onBlur={handleBlur('imie')}
@@ -82,14 +110,23 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
               placeholder="imie"
             />
             {errors.imie && touched.imie && <Text style={styles.error}>{errors.imie}</Text>}
-            <TextInput
+            {/* <TextInput
               onChangeText={handleChange('plec')}
               onBlur={handleBlur('plec')}
               value={values.plec} 
               style={styles.input}
               placeholder="plec"
-            />
-            {errors.plec && touched.plec && <Text style={styles.error}>{errors.plec}</Text>}
+            /> 
+            {errors.plec && touched.plec && <Text style={styles.error}>{errors.plec}</Text>}*/}
+            <Picker
+              selectedValue={values.plec}
+              onValueChange={(itemValue, itemIndex) =>
+                setFieldValue('plec', itemValue)
+              }>
+              <Picker.Item label="Pies" value="Pies" />
+              <Picker.Item label="Suczka" value="Suczka" />
+            </Picker>
+
             <TextInput
               onChangeText={handleChange('rasa')}
               onBlur={handleBlur('rasa')}
@@ -98,6 +135,7 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
               placeholder="rasa"
             />
             {errors.rasa && touched.rasa && <Text style={styles.error}>{errors.rasa}</Text>}
+            
             <TextInput
               onChangeText={handleChange('wiek')}
               onBlur={handleBlur('wiek')}
@@ -106,6 +144,31 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
               placeholder="wiek"
             />
             {errors.wiek && touched.wiek && <Text style={styles.error}>{errors.wiek}</Text>}
+            <TextInput
+              onChangeText={handleChange('opis')}
+              onBlur={handleBlur('opis')}
+              value={values.opis} 
+              style={styles.input}
+              placeholder="opis"
+            />
+            {errors.opis && touched.opis && <Text style={styles.error}>{errors.opis}</Text>}
+            {/*<TextInput
+              onChangeText={handleChange('voivodeship')}
+              onBlur={handleBlur('voivodeship')}
+              value={values.voivodeship} 
+              style={styles.input}
+              placeholder="voivodeship"
+            />
+            {errors.voivodeship && touched.voivodeship && <Text style={styles.error}>{errors.voivodeship}</Text>}*/}
+            <Picker
+              selectedValue={values.voivodeship}
+              onValueChange={(itemValue, itemIndex) =>
+                setFieldValue('voivodeship', itemValue)
+              }>
+              <Picker.Item label="Lodzkie" value="Lodzkie" />
+              <Picker.Item label="Malopolskie" value="Malopolskie" />
+            </Picker>
+
             <Button onPress={handleSubmit} mode="contained" style={styles.firstButton}>{Dog ? 'Edit' : 'Create'} psa</Button>
           </View>
         )}

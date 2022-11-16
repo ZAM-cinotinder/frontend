@@ -23,6 +23,8 @@ export type RootStackParamList = {
   YourDogsListScreen: undefined;
   ForgotPassword: undefined;
   AddDogScreen: DogWithId | undefined;
+  MainSwipeDogsScreen: undefined;
+  SwipeDogsScreen: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -34,6 +36,8 @@ export type RootTabParamList = {
   TabOne: undefined;
   TabTwo: undefined;
   YourDogsListScreen: undefined;
+  MainSwipeDogsScreen: undefined;
+  SwipeDogsScreen: undefined;
   Login: undefined;
   ForgotPassword: undefined;
 };
