@@ -5,7 +5,6 @@ import { useQueryClient } from 'react-query';
 import * as ImagePicker from 'expo-image-picker';
 
 import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
 import {auth, database} from '../constants/firebase';
 
 import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth';
@@ -29,8 +28,8 @@ const AddDogScheme = Yup.object().shape({
   wiek: Yup.string().matches(/^\d+$/, 'WIEK TO LICZBA').required('Required'),
 });
 
-
-export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDogScreen'>) => {
+// @ts-ignore
+export const AddDogScreen = ({ route, navigation }) => {
   const { user } = useAuthentication();
   const queryClient = useQueryClient()
   const Dog = route.params;
@@ -60,7 +59,7 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
       set(ref(database, `users/${user.uid}/Psy/${dogId}`), dogInDatabase);
       set(ref(database, `Psy/Lodz/${dogId}`), dogInDatabase);
 
-      navigation.pop();
+      navigation.navigate('AddDogScreen');
       Toast.show({
           type: 'success',
           text1: 'Sukces',

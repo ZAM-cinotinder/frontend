@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
+// import { RootStackScreenProps } from '../types';
 import {auth} from '../constants/firebase';
 
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -10,9 +10,11 @@ import { useState } from 'react';
 import { Formik } from 'formik';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import Toast from 'react-native-toast-message';
+import {DrawerScreenProps} from "@react-navigation/drawer";
 
 
-export const LoginScreen = ({ navigation }: RootStackScreenProps<'Login'>) => {
+// @ts-ignore
+export const LoginScreen = ({ navigation }) => {
   const [user, setUser] = useState('');
   const [error, setError] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -29,6 +31,7 @@ export const LoginScreen = ({ navigation }: RootStackScreenProps<'Login'>) => {
             text1: 'Logged in 🎉',
             text2: 'You are logged in',
         });
+        navigation.navigate('SwipeDogsScreen');
         // ...
       })
       .catch((error) => {
@@ -58,7 +61,7 @@ export const LoginScreen = ({ navigation }: RootStackScreenProps<'Login'>) => {
       <Formik
         initialValues={{ email: '', password: '' }}
         onSubmit={values => logIn(values.email, values.password)}
-        >
+      >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
           <View style={styles.form}>
             <TextInput

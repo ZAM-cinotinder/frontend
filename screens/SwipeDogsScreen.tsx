@@ -1,25 +1,19 @@
-import {StyleSheet, TouchableOpacity, Image, ImageStyle} from 'react-native';
-import {ref, get, orderByKey, startAt, query} from 'firebase/database';
+import { StyleSheet, Image } from 'react-native';
+import { ref } from 'firebase/database';
 import { useDatabaseValue } from '@react-query-firebase/database';
 
 import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
-import {auth, database} from '../constants/firebase';
+import { database } from '../constants/firebase';
 
-import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth';
-import {Button, TextInput} from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { useMemo, useRef, useState } from 'react';
-import {Formik} from 'formik';
-import * as Yup from 'yup';
 
-import Toast from 'react-native-toast-message';
-import {useAuthentication} from '../hooks/useAuthentication';
+import { useAuthentication} from '../hooks/useAuthentication';
 import TinderCard from 'react-tinder-card'
-import {Dog, Dogs} from '../types/Dog';
-import {useQuery} from 'react-query';
+import { Dogs } from '../types/Dog';
 
-
-export const SwipeDogsScreen = ({ navigation }: RootStackScreenProps<'SwipeDogsScreen'>) => {
+// @ts-ignore
+export const SwipeDogsScreen = ({ navigation }) => {
     const { user } = useAuthentication();
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const voivodeship = 'Lodz';
@@ -51,6 +45,7 @@ export const SwipeDogsScreen = ({ navigation }: RootStackScreenProps<'SwipeDogsS
 
     const memoizedDogCard = useMemo(() => {
       if (!dogs.data) return;
+
       let dogo = dogs.data[currentIndex];
       if (!dogo) {
         let [[firstKey, firstValue]] = Object.entries(dogs.data);
@@ -58,16 +53,19 @@ export const SwipeDogsScreen = ({ navigation }: RootStackScreenProps<'SwipeDogsS
         setCurrentIndex(firstKey);
       }
 
-      if(!dogo) return;
+      if (!dogo) {
+        return;
+      }
 
-      return <TinderCard onSwipe={onSwipe} preventSwipe={['up', 'down']} ref={swipable}>
+      return (
+        <TinderCard onSwipe={onSwipe} preventSwipe={['up', 'down']} ref={swipable}>
            <View style={styles.dogCard}>
                 <Image style={styles.dogImage} source={{uri: 'data:image/png;base64,' + dogo.photo}} />
                 <Text>{dogo.Imie} {dogo.Plec}, {dogo.Wiek}m {voivodeship}</Text>
                 <Text>{dogo.opis}</Text>
             </View>
           </TinderCard>
-
+      );
     }, [dogs.data, currentIndex]);
 
     return (
@@ -105,14 +103,9 @@ export const SwipeDogsScreen = ({ navigation }: RootStackScreenProps<'SwipeDogsS
         marginTop: 20,
     },
     form: {
-      // flex: 1,
       backgroundColor: 'transparent',
       width: '80%',
       padding: 10,
-      // alignItems: 'center',
-      // justifyContent: 'center',
-      // padding: 200,
-      // height: 20,
     },
     backgroundImg: {
       position: 'absolute',
@@ -120,7 +113,6 @@ export const SwipeDogsScreen = ({ navigation }: RootStackScreenProps<'SwipeDogsS
       right: '0%',
       left: '20%',
       zIndex: -1,
-      // width: '70%'
     },
     dogImage: {
       width: 100, 

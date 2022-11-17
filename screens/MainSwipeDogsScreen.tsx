@@ -1,10 +1,8 @@
 import { StyleSheet, Image, ImageStyle } from 'react-native';
 import {  ref, get, equalTo, orderByKey, startAt  } from "firebase/database";
-import { useDatabaseValue } from '@react-query-firebase/database';
 import { useQuery } from 'react-query';
 
 import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
 import {auth, database} from '../constants/firebase';
 
 import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth';
@@ -18,8 +16,8 @@ import Toast from 'react-native-toast-message';
 import {useAuthentication} from '../hooks/useAuthentication';
 import {Dog, Dogs} from '../types/Dog';
 
-
-export const MainSwipeDogsScreen = ({ navigation }: RootStackScreenProps<'MainSwipeDogsScreen'>) => {
+// @ts-ignore
+export const MainSwipeDogsScreen = ({ navigation }) => {
     const { user } = useAuthentication();
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const voivodeship = 'Lodz';

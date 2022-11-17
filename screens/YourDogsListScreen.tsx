@@ -1,23 +1,18 @@
-import {StyleSheet, TouchableOpacity, Image} from 'react-native';
-import {  ref, get } from "firebase/database";
+import { StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ref } from "firebase/database";
 import { useDatabaseValue } from '@react-query-firebase/database';
 
 import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
-import {auth, database} from '../constants/firebase';
+import { database } from '../constants/firebase';
 
-import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth';
-import {Button, TextInput} from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { useState } from 'react';
-import {Formik} from 'formik';
-import * as Yup from 'yup';
 
-import Toast from 'react-native-toast-message';
-import {useAuthentication} from '../hooks/useAuthentication';
-import {Dog, Dogs} from '../types/Dog';
+import { useAuthentication } from '../hooks/useAuthentication';
+import { Dogs } from '../types/Dog';
 
-
-export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDogsListScreen'>) => {
+// @ts-ignore
+export const YourDogsListScreen = ({ navigation }) => {
     const { user } = useAuthentication();
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const dbRef = ref(database, `users/${user?.uid ?? '*'}/Psy`);
@@ -29,7 +24,7 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
       if(!dogs?.data) return null;
       
       return Object.entries(dogs.data).map(([id, dog]) => (
-        <TouchableOpacity onPress={() => navigation.push('AddDogScreen', {...dog, id})} style={styles.dogCard} key={id}>
+        <TouchableOpacity onPress={() => navigation.navigate('AddDogScreen', {...dog, id})} style={styles.dogCard} key={id}>
           <View style={{flex: 1}}>
             <Text style={styles.dogName}>{dog.Imie}, {dog.Rasa} {dog.Wiek}m</Text>
             <Text style={styles.dogPlec}>{dog.Plec}</Text>
@@ -44,11 +39,9 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
 
     return (
       <View style={styles.container}>
-          <Button mode="contained" onPress={() => navigation.push('AddDogScreen')} style={{marginBottom: 16}}>Add new dog</Button>
+          <Button mode="contained" onPress={() => navigation.navigate('AddDogScreen')} style={{marginBottom: 16}}>Add new dog</Button>
           {renderDogCards()}
           <Image source={require('../assets/psy/tmpspemxaxj.png')} style={styles.backgroundImg} />
-          {/* <Text style={styles.linkText}>{user}</Text>
-          <Text style={styles.linkText}>{error}</Text> */}
       </View>
     );
   }
@@ -61,14 +54,9 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
       padding: 20,
     },
     form: {
-      // flex: 1,
       backgroundColor: 'transparent',
       width: '80%',
       padding: 10,
-      // alignItems: 'center',
-      // justifyContent: 'center',
-      // padding: 200,
-      // height: 20,
     },
     backgroundImg: {
       position: 'absolute',
@@ -76,7 +64,6 @@ export const YourDogsListScreen = ({ navigation }: RootStackScreenProps<'YourDog
       right: '0%',
       left: '20%',
       zIndex: -1,
-      // width: '70%'
     },
     dogImage: {
       width: 100, 
