@@ -1,5 +1,5 @@
 import { StyleSheet, Image } from 'react-native';
-import { ref } from 'firebase/database';
+import { ref, set } from 'firebase/database';
 import { useDatabaseValue } from '@react-query-firebase/database';
 
 import { Text, View } from '../components/Themed';
@@ -10,7 +10,9 @@ import { useMemo, useRef, useState } from 'react';
 
 import { useAuthentication} from '../hooks/useAuthentication';
 import TinderCard from 'react-tinder-card'
+import { v4 as uuid } from 'uuid';
 import { Dogs } from '../types/Dog';
+import { Message } from '../types/Message';
 
 // @ts-ignore
 export const SwipeDogsScreen = ({ navigation }) => {
@@ -28,7 +30,7 @@ export const SwipeDogsScreen = ({ navigation }) => {
     //     query(dbRef, orderByKey(), ...(lastId ? [startAt(lastId)] : [])),
     // })
     const dbRef = ref(database, `Psy/${voivodeship}`);
-    const dogs = useDatabaseValue<Dogs>(["Psy", user?.uid], dbRef, {
+    const dogs = useDatabaseValue<Dogs>(["Psy"], dbRef, {
       subscribe: true,
     });
     const [currentIndex, setCurrentIndex] = useState('');
@@ -38,6 +40,49 @@ export const SwipeDogsScreen = ({ navigation }) => {
       const lastArrayIndex = Object.keys(dogs.data!).indexOf(currentIndex);
       const nextDogIndex = Object.keys(dogs.data!)[lastArrayIndex + 1];
       console.log(currentIndex, nextDogIndex);
+
+      if (direction === 'right'){
+        const messageId = uuid();
+        const dog = dogs.data![currentIndex];
+        const messageInDatabase: Message = {
+          text: 'Utworzono czat',
+          date: new Date().toISOString(),
+          who: user!.uid,
+        };
+        
+        set(
+          ref(
+            database,
+            `Chats/${messageId}/0`
+          ),
+          messageInDatabase
+        );
+        set(
+          ref(
+            database,
+            `users/${user!.uid}/Chats/${messageId}`
+          ),
+          {
+            otherDogId: currentIndex,
+            otherUserId: dog.userId,
+            lastMessage: messageInDatabase,
+            isSeen: true,
+          }
+        );
+        set(
+          ref(
+            database,
+            `users/${dog.userId}/Chats/${messageId}`
+          ),
+          {
+            otherDogId: '', //  TODO SELECT DOG MODAL
+            otherUserId: user!.uid,
+            lastMessage: messageInDatabase,
+            isSeen: false,
+          }
+        );
+      }
+
       setCurrentIndex(nextDogIndex);
       // @ts-ignore
       setTimeout(swipable.current?.restoreCard, 10)
@@ -73,11 +118,9 @@ export const SwipeDogsScreen = ({ navigation }) => {
         {memoizedDogCard}
           <View style={styles.buttonPanel}>
             {/* @ts-ignore */}
-              <Button style={styles.mainScreenButton} onPress={()=>swipable.current?.swipe('left')}>a</Button>
-              <Button style={styles.mainScreenButton}>b</Button>
-              <Button style={styles.mainScreenButton}>c</Button>
+              <Button style={styles.mainScreenButton} onPress={()=>swipable.current?.swipe('left')}>Pomiń</Button>
             {/* @ts-ignore */}
-              <Button style={styles.mainScreenButton} onPress={()=>swipable.current?.swipe('right')}>d</Button>
+              <Button style={styles.mainScreenButton} onPress={()=>swipable.current?.swipe('right')}>Dodaj</Button>
           </View>
       </View>
   );
@@ -94,13 +137,11 @@ export const SwipeDogsScreen = ({ navigation }) => {
     buttonPanel:{
         flexDirection: "row",
         flexWrap: "wrap",
+        gap: 48,
+        justifyContent: 'space-evenly',
+        marginTop: 36,
     },
     mainScreenButton: {
-        backgroundColor:'blue',
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        marginTop: 20,
     },
     form: {
       backgroundColor: 'transparent',

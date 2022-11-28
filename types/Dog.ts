@@ -4,6 +4,9 @@ export interface Dog {
     Rasa: string;
     Wiek: number;
     userId: string;
+    photo: string;
+    opis: string;
+    voivodeship: string;
 }
 
 export interface DogWithId extends Dog {

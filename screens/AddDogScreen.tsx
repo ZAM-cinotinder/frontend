@@ -20,6 +20,7 @@ import {useAuthentication} from '../hooks/useAuthentication';
 import {Dog} from '../types/Dog';
 
 import {Picker} from '@react-native-picker/picker';
+import {RootStackScreenProps} from '../types';
 
 const AddDogScheme = Yup.object().shape({
   imie: Yup.string().required('Required'),
@@ -28,12 +29,11 @@ const AddDogScheme = Yup.object().shape({
   wiek: Yup.string().matches(/^\d+$/, 'WIEK TO LICZBA').required('Required'),
 });
 
-// @ts-ignore
-export const AddDogScreen = ({ route, navigation }) => {
+export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDogScreen'>) => {
   const { user } = useAuthentication();
   const queryClient = useQueryClient()
   const Dog = route.params;
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(Dog?.photo);
   const pushToDatabase = (name:string,gender:string,breed:string,age:string, description:string, wojewodztwo:string) =>{
 
       Toast.show({
@@ -54,12 +54,13 @@ export const AddDogScreen = ({ route, navigation }) => {
       }
 
       const dogId = Dog?.id ?? uuid();
-      queryClient.invalidateQueries(["Psy", user?.uid]);
+      // queryClient.invalidateQueries(["Psy", user?.uid]);
 
       set(ref(database, `users/${user.uid}/Psy/${dogId}`), dogInDatabase);
       set(ref(database, `Psy/Lodz/${dogId}`), dogInDatabase);
 
-      navigation.navigate('AddDogScreen');
+      // navigation.navigate('AddDogScreen');
+      navigation.pop();
       Toast.show({
           type: 'success',
           text1: 'Sukces',
@@ -91,7 +92,7 @@ export const AddDogScreen = ({ route, navigation }) => {
             imie: Dog?.Imie ?? '', 
             plec: Dog?.Plec ?? 'Pies', 
             rasa: Dog?.Rasa ?? '', 
-            wiek: String(Dog?.Wiek),
+            wiek: Dog?.Wiek ? String(Dog?.Wiek) : '',
             opis: Dog?.opis ?? '', 
             voivodeship: Dog?.voivodeship ?? 'Lodzkie',
         }}
@@ -100,6 +101,7 @@ export const AddDogScreen = ({ route, navigation }) => {
         >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
           <View style={styles.form}>
+            <Image style={styles.dogoImage} source={{uri: 'data:image/png;base64,' + image}} />
             <Button mode='contained' onPress={addImage} >Add image</Button>
             <TextInput
               onChangeText={handleChange('imie')}
@@ -201,6 +203,13 @@ const styles = StyleSheet.create({
     left: '0%',
     zIndex: -1,
     // width: '70%'
+  },
+  dogoImage: {
+    width: 100,
+    height: 100,
+    margin: 16,
+    alignSelf: 'center',
+    borderRadius: 8,
   },
   input: {
     width: '100%',

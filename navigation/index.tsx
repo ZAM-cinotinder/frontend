@@ -26,6 +26,8 @@
  import {AddDogScreen} from '../screens/AddDogScreen';
  import {SwipeDogsScreen} from '../screens/SwipeDogsScreen';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import {ChatListScreen} from '../screens/ChatListScreen';
+import {ChatViewScreen} from '../screens/ChatViewScreen';
  
  export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
    const { user } = useAuthentication();
@@ -48,8 +50,10 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
        <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
        <Stack.Screen name="Login" component={LoginScreen} />
        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'login!' }} />
-       <Stack.Screen name="AddDogScreen" component={AddDogScreen} options={{ headerShown: false }} />
-       <Stack.Screen name="SwipeDogsScreen" component={SwipeDogsScreen} options={{ headerShown: false }} />
+       <Stack.Screen name="AddDogScreen" component={AddDogScreen} />
+       <Stack.Screen name="SwipeDogsScreen" component={SwipeDogsScreen}  />
+       <Stack.Screen name="ChatListScreen" component={ChatListScreen}  />
+       <Stack.Screen name="ChatViewScreen" component={ChatViewScreen}  />
        <Stack.Group screenOptions={{ presentation: 'modal' }}>
          <Stack.Screen name="Modal" component={ModalScreen} />
        </Stack.Group>
@@ -88,14 +92,21 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
          name="SwipeDogsScreen"
          component={SwipeDogsScreen}
          options={{
-           title: 'SwipeDogsScreen',
+           title: 'Znajdź psa',
          }}
        />
        <Drawer.Screen
          name="YourDogsListScreen"
          component={YourDogsListScreen}
          options={{
-           title: 'yourDogsListScreen',
+           title: 'Twoje psy',
+         }}
+       />
+       <Drawer.Screen
+         name="ChatListScreen"
+         component={ChatListScreen}
+         options={{
+           title: 'Wiadomości',
          }}
        />
      </Drawer.Navigator>

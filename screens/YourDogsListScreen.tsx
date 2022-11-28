@@ -14,7 +14,6 @@ import { Dogs } from '../types/Dog';
 // @ts-ignore
 export const YourDogsListScreen = ({ navigation }) => {
     const { user } = useAuthentication();
-    const [secureTextEntry, setSecureTextEntry] = useState(true);
     const dbRef = ref(database, `users/${user?.uid ?? '*'}/Psy`);
     const dogs = useDatabaseValue<Dogs>(["Psy", user?.uid], dbRef, {
       subscribe: true,

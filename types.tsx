@@ -7,6 +7,7 @@
  import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
  import { NativeStackScreenProps } from '@react-navigation/native-stack';
  import {Dog, DogWithId} from './types/Dog';
+import {ChatScreenProps} from './types/Chat';
  
  declare global {
    namespace ReactNavigation {
@@ -25,7 +26,9 @@
    AddDogScreen: DogWithId | undefined;
    MainSwipeDogsScreen: undefined;
    SwipeDogsScreen: undefined;
- };
+   ChatListScreen: undefined;
+   ChatViewScreen: ChatScreenProps;
+  };
  
  export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
    RootStackParamList,
@@ -40,6 +43,8 @@
    SwipeDogsScreen: undefined;
    Login: undefined;
    ForgotPassword: undefined;
+   ChatListScreen: undefined;
+   ChatViewScreen: ChatScreenProps;
  };
  
  export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
