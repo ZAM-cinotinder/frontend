@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native';
 import { ref } from "firebase/database";
 import { useDatabaseValue } from '@react-query-firebase/database';
 
@@ -39,8 +39,10 @@ export const YourDogsListScreen = ({ navigation }) => {
     return (
       <View style={styles.container}>
           <Button mode="contained" onPress={() => navigation.navigate('AddDogScreen')} style={{marginBottom: 16}}>Add new dog</Button>
+          <ScrollView style={styles.scrollable} >
           {renderDogCards()}
-          <Image source={require('../assets/psy/tmpspemxaxj.png')} style={styles.backgroundImg} />
+          </ScrollView>
+          <Image source={require('../assets/psy/tmpg5s7r8fg.png')} style={styles.backgroundImg} />
       </View>
     );
   }
@@ -51,11 +53,16 @@ export const YourDogsListScreen = ({ navigation }) => {
       alignItems: 'center',
       justifyContent: 'flex-start',
       padding: 20,
+      width: '100%',
     },
     form: {
       backgroundColor: 'transparent',
       width: '80%',
       padding: 10,
+    },
+    scrollable: {
+      width: '100%',
+      flex: 1,
     },
     backgroundImg: {
       position: 'absolute',
@@ -76,9 +83,7 @@ export const YourDogsListScreen = ({ navigation }) => {
         padding: 16,
         borderRadius: 10,
         marginBottom: 10,
-
         flexDirection: "row",
-        flexWrap: "wrap",
 
         justifyContent: "space-between",
         

@@ -21,6 +21,7 @@ import {Dog} from '../types/Dog';
 
 import {Picker} from '@react-native-picker/picker';
 import {RootStackScreenProps} from '../types';
+import {vivodeships} from '../types/WOJEWODZTWA';
 
 const AddDogScheme = Yup.object().shape({
   imie: Yup.string().required('Required'),
@@ -72,7 +73,7 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.3,
+      quality: 0.1,
       base64: true,
     });
 
@@ -83,6 +84,24 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
       // @ts-ignore
       setImage(result.base64);
     }
+  }
+
+  const takeImage = async () => {
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.1,
+        base64: true,
+      }); 
+
+      console.log(result);
+
+      // @ts-ignore
+      if (!result.canceled) {
+        // @ts-ignore
+        setImage(result.base64);
+      }
   }
 
   return (
@@ -102,7 +121,8 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
           <View style={styles.form}>
             <Image style={styles.dogoImage} source={{uri: 'data:image/png;base64,' + image}} />
-            <Button mode='contained' onPress={addImage} >Add image</Button>
+            <Button mode='contained' onPress={addImage} style={{marginVertical: 4}} >Wybierz zdjęcie</Button>
+            <Button mode='contained' onPress={takeImage} style={{marginVertical: 4}} >Zrób zdjęcie</Button>
             <TextInput
               onChangeText={handleChange('imie')}
               onBlur={handleBlur('imie')}
@@ -166,8 +186,10 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
               onValueChange={(itemValue, itemIndex) =>
                 setFieldValue('voivodeship', itemValue)
               }>
-              <Picker.Item label="Lodzkie" value="Lodzkie" />
-              <Picker.Item label="Malopolskie" value="Malopolskie" />
+              {vivodeships
+                .map((vivodeship) => (
+                  <Picker.Item label={vivodeship} value={vivodeship} key={vivodeship} />
+                  ))}
             </Picker>
 
             <Button onPress={handleSubmit} mode="contained" style={styles.firstButton}>{Dog ? 'Edit' : 'Create'} psa</Button>
