@@ -11,13 +11,13 @@ import { useMemo, useRef, useState } from 'react';
 import { useAuthentication} from '../hooks/useAuthentication';
 import TinderCard from 'react-tinder-card'
 import { v4 as uuid } from 'uuid';
+import {SelectDogDialog } from '../components/SelectDogDialog';
 import { Dogs } from '../types/Dog';
 import { Message } from '../types/Message';
 
 // @ts-ignore
 export const SwipeDogsScreen = ({ navigation }) => {
     const { user } = useAuthentication();
-    const [secureTextEntry, setSecureTextEntry] = useState(true);
     const voivodeship = 'Lodz';
     const swipable = useRef(null);
     // const dbRef = ref(database, `Psy/${voivodeship}`);
@@ -30,20 +30,31 @@ export const SwipeDogsScreen = ({ navigation }) => {
     //     query(dbRef, orderByKey(), ...(lastId ? [startAt(lastId)] : [])),
     // })
     const dbRef = ref(database, `Psy/${voivodeship}`);
-    const dogs = useDatabaseValue<Dogs>(["Psy"], dbRef, {
+    const unfilteredDogs = useDatabaseValue<Dogs>(["Psy"], dbRef, {
       subscribe: true,
     });
+    const dogs = useMemo((): Dogs => {
+      if (unfilteredDogs.data && user) {
+        return Object.entries(unfilteredDogs.data)
+        .filter(([id, dog]) => dog.userId !== user!.uid)
+        .reduce((acc, [id, dog]) => ({ ...acc, [id]: dog }), {});
+      }
+      return {};
+    }, [unfilteredDogs.data, user?.uid]);
     const [currentIndex, setCurrentIndex] = useState('');
-  
-    const onSwipe = (direction: string) => {
-      console.log('You swiped: ' + direction)
-      const lastArrayIndex = Object.keys(dogs.data!).indexOf(currentIndex);
-      const nextDogIndex = Object.keys(dogs.data!)[lastArrayIndex + 1];
-      console.log(currentIndex, nextDogIndex);
+    const [selectDogDialogVisible, setSelectDogDialogVisible] = useState(false);
 
-      if (direction === 'right'){
+    const nextDog = () => {
+      const lastArrayIndex = Object.keys(dogs).indexOf(currentIndex);
+      const nextDogIndex = Object.keys(dogs)[lastArrayIndex + 1];
+
+        setCurrentIndex(nextDogIndex);
+    }
+
+    const onDogSelect = (dogId: string) => {
+
         const messageId = uuid();
-        const dog = dogs.data![currentIndex];
+        const dog = dogs[currentIndex];
         const messageInDatabase: Message = {
           text: 'Utworzono czat',
           date: new Date().toISOString(),
@@ -75,26 +86,46 @@ export const SwipeDogsScreen = ({ navigation }) => {
             `users/${dog.userId}/Chats/${messageId}`
           ),
           {
-            otherDogId: '', //  TODO SELECT DOG MODAL
+            otherDogId: dogId,
             otherUserId: user!.uid,
             lastMessage: messageInDatabase,
             isSeen: false,
           }
         );
-      }
+        nextDog();
+        // @ts-ignore
+        setTimeout(swipable.current?.restoreCard, 10)
+        setSelectDogDialogVisible(false);
+    };
 
-      setCurrentIndex(nextDogIndex);
+    const onModalDismiss = () => {
+      nextDog();
       // @ts-ignore
       setTimeout(swipable.current?.restoreCard, 10)
+      setSelectDogDialogVisible(false);
+    }
+  
+    const onSwipe = (direction: string) => {
+      switch(direction){
+        case 'left':
+          nextDog();
+          // @ts-ignore
+          setTimeout(swipable.current?.restoreCard, 10)
+          break;
+        case 'right':
+          setSelectDogDialogVisible(true);
+          break;
+      }
     }
 
     const memoizedDogCard = useMemo(() => {
-      if (!dogs.data) return;
-
-      let dogo = dogs.data[currentIndex];
+      let dogo = dogs[currentIndex];
       if (!dogo) {
-        let [[firstKey, firstValue]] = Object.entries(dogs.data);
+        let [firstDogo] = Object.entries(dogs);
+        if(!firstDogo) return;
+        const [firstKey, firstValue] = firstDogo;
         dogo = firstValue;
+
         setCurrentIndex(firstKey);
       }
 
@@ -111,10 +142,11 @@ export const SwipeDogsScreen = ({ navigation }) => {
             </View>
           </TinderCard>
       );
-    }, [dogs.data, currentIndex]);
+    }, [dogs, currentIndex]);
 
     return (
       <View style={styles.container}>
+        <SelectDogDialog onSelect={onDogSelect} onDismiss={onModalDismiss} visible={selectDogDialogVisible} />
         {memoizedDogCard}
           <View style={styles.buttonPanel}>
             {/* @ts-ignore */}
@@ -122,6 +154,7 @@ export const SwipeDogsScreen = ({ navigation }) => {
             {/* @ts-ignore */}
               <Button style={styles.mainScreenButton} onPress={()=>swipable.current?.swipe('right')}>Dodaj</Button>
           </View>
+          <Image source={require('../assets/psy/tmp9mz_gec9.png')} style={styles.backgroundImg} />
       </View>
   );
   }
