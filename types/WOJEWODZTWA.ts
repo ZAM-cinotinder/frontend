@@ -1,0 +1,18 @@
+export const vivodeships: string[] = [
+    'Lodzkie',
+    'Dolnoslaskie',
+    'Kujawsko-pomorskie',
+    'Lubelskie',
+    'Lubuskie',
+    'Malopolskie',
+    'Mazowieckie',
+    'Opolskie',
+    'Podkarpackie',
+    'Podlaskie',
+    'Pomorskie',
+    'Slaskie',
+    'Swietokrzyskie',
+    'Warminsko-mazurskie',
+    'Wielkopolskie',
+    'Zachodniopomorskie',
+]

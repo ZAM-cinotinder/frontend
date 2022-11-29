@@ -28,7 +28,8 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {ChatListScreen} from '../screens/ChatListScreen';
 import {ChatViewScreen} from '../screens/ChatViewScreen';
- 
+import {UpdateUserProfileScreen} from '../screens/UpdateUserProfileScreen'; 
+
  export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
    const { user } = useAuthentication();
    return user ? <UserStack colorScheme={colorScheme} /> : <AuthStack colorScheme={colorScheme} />;
@@ -46,14 +47,15 @@ import {ChatViewScreen} from '../screens/ChatViewScreen';
        linking={LinkingConfiguration}
        theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
      <Stack.Navigator>
-       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-       <Stack.Screen name="Login" component={LoginScreen} />
-       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'login!' }} />
-       <Stack.Screen name="AddDogScreen" component={AddDogScreen} />
-       <Stack.Screen name="SwipeDogsScreen" component={SwipeDogsScreen}  />
-       <Stack.Screen name="ChatListScreen" component={ChatListScreen}  />
-       <Stack.Screen name="ChatViewScreen" component={ChatViewScreen}  />
+        <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'login!' }} />
+        <Stack.Screen name="AddDogScreen" component={AddDogScreen} />
+        <Stack.Screen name="SwipeDogsScreen" component={SwipeDogsScreen}  />
+        <Stack.Screen name="ChatListScreen" component={ChatListScreen}  />
+        <Stack.Screen name="ChatViewScreen" component={ChatViewScreen}  />
+        <Stack.Screen name="UpdateUserProfileScreen" component={UpdateUserProfileScreen} />
        <Stack.Group screenOptions={{ presentation: 'modal' }}>
          <Stack.Screen name="Modal" component={ModalScreen} />
        </Stack.Group>
@@ -71,6 +73,7 @@ import {ChatViewScreen} from '../screens/ChatViewScreen';
        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
        <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
+
      </Stack.Navigator>
      </NavigationContainer>
    );
@@ -107,6 +110,13 @@ import {ChatViewScreen} from '../screens/ChatViewScreen';
          component={ChatListScreen}
          options={{
            title: 'Wiadomości',
+         }}
+       />
+       <Drawer.Screen
+         name="UpdateUserProfileScreen"
+         component={UpdateUserProfileScreen}
+         options={{
+           title: 'Edycja profilu',
          }}
        />
      </Drawer.Navigator>

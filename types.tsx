@@ -28,6 +28,7 @@ import {ChatScreenProps} from './types/Chat';
    SwipeDogsScreen: undefined;
    ChatListScreen: undefined;
    ChatViewScreen: ChatScreenProps;
+   UpdateUserProfileScreen: undefined;
   };
  
  export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -45,6 +46,7 @@ import {ChatScreenProps} from './types/Chat';
    ForgotPassword: undefined;
    ChatListScreen: undefined;
    ChatViewScreen: ChatScreenProps;
+   UpdateUserProfileScreen: undefined;
  };
  
  export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
