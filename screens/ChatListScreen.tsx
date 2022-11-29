@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Image } from "react-native";
+import {StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native';
 import { ref, get } from "firebase/database";
 import { useDatabaseValue } from "@react-query-firebase/database";
 import { format } from "date-fns";
@@ -54,25 +54,32 @@ export const ChatListScreen = ({
   const renderChatCards = () => {
     if (!chats?.data) return null;
 
-    return Object.entries(chats.data).map(([id, chat]) => (
+    return Object.entries(chats.data).map(([id, chat]) => {
+      const dog = dogs?.[chat.otherDogId];
+      if(!dog) return null;
+
+      return (
       <TouchableOpacity
         onPress={() => navigation.navigate("ChatViewScreen", { chatId: id, otherUserId: chat.otherUserId })}
         style={styles.dogCard}
         key={id}
       >
+        {/* <Text>{'data:image/png;base64,' +  dog.photo}</Text> */}
+        <Image style={styles.dogImage} source={{uri: 'data:image/png;base64,' +  dog.photo}}/>
         <View style={{ flex: 1 }}>
-          <Text style={styles.dogName}>{dogs?.[chat.otherDogId]?.Imie}</Text>
+          <Text style={styles.dogName}>{dog.Imie}, {dog.Rasa} {dog.Wiek}m</Text>
           <Text style={styles.lastMessage}>{chat.lastMessage.text}</Text>
           <Text style={styles.timeSend}>{formatDate(chat.lastMessage.date)}</Text>
         </View>
-        <Image style={styles.dogImage} source={{uri: 'data:image/png;base64,' +  dogs?.[chat.otherDogId]?.photo}}/>
       </TouchableOpacity>
-    ));
+    )});
   };
 
   return (
     <View style={styles.container}>
+    <ScrollView style={styles.scrollable} >
       {renderChatCards()}
+                    </ScrollView>
       <Image
         source={require("../assets/psy/tmpspemxaxj.png")}
         style={styles.backgroundImg}
@@ -87,6 +94,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     padding: 20,
+    width: '100%',
+  },
+  scrollable: {
+    width: '100%',
+    flex: 1,
   },
   form: {
     backgroundColor: "transparent",
@@ -105,6 +117,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderWidth: 1,
     borderRadius: 16,
+    marginRight: 16
   },
   dogCard: {
     backgroundColor: "#fff",
