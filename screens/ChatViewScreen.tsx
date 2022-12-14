@@ -31,13 +31,10 @@ export const ChatViewScreen = ({
   );
 
   useEffect(() => {
-    if(!user || !messages?.data) return;
+    if (!user || !messages?.data) return;
 
     set(
-      ref(
-        database,
-        `users/${user.uid}/Chats/${route.params.chatId}/isSeen`
-      ),
+      ref(database, `users/${user.uid}/Chats/${route.params.chatId}/isSeen`),
       true
     );
   }, [messages.data, user]);
@@ -127,7 +124,7 @@ export const ChatViewScreen = ({
           touched,
           setFieldValue,
         }) => (
-          <View style={{backgroundColor: 'transparent'}}>
+          <View style={{ backgroundColor: "transparent" }}>
             <View style={styles.form}>
               <TextInput
                 onChangeText={handleChange("message")}

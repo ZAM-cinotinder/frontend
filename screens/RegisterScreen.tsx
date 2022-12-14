@@ -1,48 +1,51 @@
-import {StyleSheet, TouchableOpacity, Image} from 'react-native';
-import {  ref, set } from "firebase/database";
+import { StyleSheet, TouchableOpacity, Image } from "react-native";
+import { ref, set } from "firebase/database";
 
-import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
-import {auth, database} from '../constants/firebase';
+import { Text, View } from "../components/Themed";
+import { RootStackScreenProps } from "../types";
+import { auth, database } from "../constants/firebase";
 
-import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth';
-import {Button, TextInput} from 'react-native-paper';
-import { useState } from 'react';
-import {Formik} from 'formik';
-import * as Yup from 'yup';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { Button, TextInput } from "react-native-paper";
+import { useState } from "react";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 
 const SignupSchema = Yup.object().shape({
-  password: Yup.string()
-    .min(8, 'Too Short!')
-    .required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string().min(8, "Too Short!").required("Required"),
+  email: Yup.string().email("Invalid email").required("Required"),
 });
 
-
-export const RegisterScreen = ({ navigation }: RootStackScreenProps<'Register'>) => {
-  const [user, setUser] = useState('');
-  const [error, setError] = useState('');
+export const RegisterScreen = ({
+  navigation,
+}: RootStackScreenProps<"Register">) => {
+  const [user, setUser] = useState("");
+  const [error, setError] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  const pushToDatabase = (email:string,userId:string) =>{
+  const pushToDatabase = (email: string, userId: string) => {
     const userInDatabase = {
       email: email,
-    }
-    set(ref(database, 'users/' + userId), userInDatabase);
-  }
+    };
+    set(ref(database, "users/" + userId), userInDatabase);
+  };
 
   const signUpIn = (email: string, password: string) => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in 
+        // Signed in
         const user = userCredential.user;
 
         setUser(JSON.stringify(user));
         Toast.show({
-            type: 'success',
-            text1: 'Account created 🎉',
+          type: "success",
+          text1: "Account created 🎉",
         });
 
         pushToDatabase(email, user.uid);
@@ -50,53 +53,61 @@ export const RegisterScreen = ({ navigation }: RootStackScreenProps<'Register'>)
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        if(errorCode === 'auth/email-already-in-use'){
+        if (errorCode === "auth/email-already-in-use") {
           Toast.show({
-              type: 'error',
-              text1: 'Email already exist ❌',
+            type: "error",
+            text1: "Email already exist ❌",
           });
         } else
-         Toast.show({
-            type: 'error',
-            text1: 'Unknown error ❌',
+          Toast.show({
+            type: "error",
+            text1: "Unknown error ❌",
             text2: error.message,
-        });
+          });
 
         setError(JSON.stringify(error));
         // ..
       });
-    }
+  };
 
   return (
     <View style={styles.container}>
-    <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Image source={require("../assets/logo.png")} style={styles.logo} />
       <Text style={styles.title}>Sign up</Text>
       <Formik
-        initialValues={{ email: '', password: '' }}
-        onSubmit={values => signUpIn(values.email, values.password)}
+        initialValues={{ email: "", password: "" }}
+        onSubmit={(values) => signUpIn(values.email, values.password)}
         validationSchema={SignupSchema}
-        >
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
           <View style={styles.form}>
             <TextInput
-              onChangeText={handleChange('email')}
-              onBlur={handleBlur('email')}
-              value={values.email} 
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
+              value={values.email}
               style={styles.input}
               placeholder="Email"
               textContentType="emailAddress"
               error={Boolean(errors.email && touched.email)}
             />
-            {errors.email && touched.email && <Text style={styles.error}>{errors.email}</Text>}
+            {errors.email && touched.email && (
+              <Text style={styles.error}>{errors.email}</Text>
+            )}
             <TextInput
-              onChangeText={handleChange('password')}
-              onBlur={handleBlur('password')}
+              onChangeText={handleChange("password")}
+              onBlur={handleBlur("password")}
               value={values.password}
-              secureTextEntry={secureTextEntry} 
+              secureTextEntry={secureTextEntry}
               style={styles.input}
               placeholder="password"
               error={Boolean(errors.password && touched.password)}
-
               right={
                 <TextInput.Icon
                   icon={secureTextEntry ? "eye" : "eye-off"}
@@ -107,31 +118,48 @@ export const RegisterScreen = ({ navigation }: RootStackScreenProps<'Register'>)
                 />
               }
             />
-            {errors.password && touched.password && <Text style={styles.error}>{errors.password}</Text>}
-            <Button onPress={handleSubmit} mode="contained" style={styles.firstButton}>Create account</Button>
-            <Button onPress={() => navigation.navigate('Login')} mode="contained" style={styles.button}>Log in</Button>
+            {errors.password && touched.password && (
+              <Text style={styles.error}>{errors.password}</Text>
+            )}
+            <Button
+              onPress={handleSubmit}
+              mode="contained"
+              style={styles.firstButton}
+            >
+              Create account
+            </Button>
+            <Button
+              onPress={() => navigation.navigate("Login")}
+              mode="contained"
+              style={styles.button}
+            >
+              Log in
+            </Button>
           </View>
         )}
-        </Formik>
+      </Formik>
 
-        <Image source={require('../assets/psy/tmpkteo13bp.png')} style={styles.backgroundImg} />
-        {/* <Text style={styles.linkText}>{user}</Text>
+      <Image
+        source={require("../assets/psy/tmpkteo13bp.png")}
+        style={styles.backgroundImg}
+      />
+      {/* <Text style={styles.linkText}>{user}</Text>
         <Text style={styles.linkText}>{error}</Text> */}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   form: {
     // flex: 1,
-    backgroundColor: 'transparent',
-    width: '80%',
+    backgroundColor: "transparent",
+    width: "80%",
     padding: 10,
     // alignItems: 'center',
     // justifyContent: 'center',
@@ -139,24 +167,24 @@ const styles = StyleSheet.create({
     // height: 20,
   },
   backgroundImg: {
-    position: 'absolute',
-    bottom: '-10%',
-    right: '0%',
-    left: '0%',
+    position: "absolute",
+    bottom: "-10%",
+    right: "0%",
+    left: "0%",
     zIndex: -1,
     opacity: 0.08,
     // width: '70%'
   },
   input: {
-    width: '100%',
+    width: "100%",
     margin: 3,
   },
   firstButton: {
-      margin: 3,
-      marginTop: 12,
+    margin: 3,
+    marginTop: 12,
   },
   error: {
-    color: 'red',
+    color: "red",
   },
   button: {
     margin: 3,
@@ -166,7 +194,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   link: {
     marginTop: 15,
@@ -174,7 +202,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#2e78b7',
+    color: "#2e78b7",
     marginBottom: 12,
   },
 });
