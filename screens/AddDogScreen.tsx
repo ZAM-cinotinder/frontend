@@ -1,4 +1,4 @@
-import {StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, TouchableOpacity, Image,Switch} from 'react-native';
 import {  ref, set } from "firebase/database";
 import { useDatabaseValue } from '@react-query-firebase/database';
 import { useQueryClient } from 'react-query';
@@ -35,7 +35,7 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
   const queryClient = useQueryClient()
   const Dog = route.params;
   const [image, setImage] = useState(Dog?.photo);
-  const pushToDatabase = (name:string,gender:string,breed:string,age:string, description:string, wojewodztwo:string) =>{
+  const pushToDatabase = (name:string,gender:string,breed:string,age:string, description:string, wojewodztwo:string, czyAktywny:boolean) =>{
 
       Toast.show({
           type: 'error',
@@ -52,6 +52,7 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
         photo: image ?? '',
         opis: description,
         voivodeship: wojewodztwo,
+        isActive: czyAktywny,
       }
 
       const dogId = Dog?.id ?? uuid();
@@ -191,7 +192,8 @@ export const AddDogScreen = ({ route, navigation }: RootStackScreenProps<'AddDog
                   <Picker.Item label={vivodeship} value={vivodeship} key={vivodeship} />
                   ))}
             </Picker>
-
+            <Switch 
+            />
             <Button onPress={handleSubmit} mode="contained" style={styles.firstButton}>{Dog ? 'Edit' : 'Create'} psa</Button>
           </View>
         )}
