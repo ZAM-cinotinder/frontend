@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Image, Switch } from "react-native";
+import { StyleSheet, TouchableOpacity, Image, Switch, Switch as Stitch } from "react-native";
 import { ref, set } from "firebase/database";
 import { useDatabaseValue } from "@react-query-firebase/database";
 import { useQueryClient } from "react-query";
@@ -48,8 +48,8 @@ export const AddDogScreen = ({
     breed: string,
     age: string,
     description: string,
-    wojewodztwo: string
-    isActive: boolean,
+    wojewodztwo: string,
+    czyAktywny: boolean
   ) => {
     Toast.show({
       type: "error",
@@ -68,13 +68,14 @@ export const AddDogScreen = ({
       photo: image ?? "",
       opis: description,
       voivodeship: wojewodztwo,
+      isActive: czyAktywny,
     };
 
     const dogId = Dog?.id ?? uuid();
     // queryClient.invalidateQueries(["Psy", user?.uid]);
 
     set(ref(database, `users/${user.uid}/Psy/${dogId}`), dogInDatabase);
-    set(ref(database, `Psy/Lodz/${dogId}`), dogInDatabase);
+    set(ref(database, `Psy/${wojewodztwo}/${dogId}`), dogInDatabase);
 
     // navigation.navigate('AddDogScreen');
     navigation.pop();
@@ -130,9 +131,10 @@ export const AddDogScreen = ({
           wiek: Dog?.Wiek ? String(Dog?.Wiek) : "",
           opis: Dog?.opis ?? "",
           voivodeship: Dog?.voivodeship ?? "Lodzkie",
+          isActive: Dog?.isActive ?? true,
         }}
-        onSubmit={({ imie, plec, rasa, wiek, opis, voivodeship }) =>
-          pushToDatabase(imie, plec, rasa, wiek, opis, voivodeship)
+        onSubmit={({ imie, plec, rasa, wiek, opis, voivodeship, isActive }) =>
+          pushToDatabase(imie, plec, rasa, wiek, opis, voivodeship, isActive)
         }
         validationSchema={AddDogScheme}
       >
@@ -245,16 +247,20 @@ export const AddDogScreen = ({
                 />
               ))}
             </Picker>
+            
+            <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',margin:3}}>
+            <Text>Aktywny</Text>
             <Switch 
-            />
-            <Button onPress={handleSubmit} mode="contained" style={styles.firstButton}>{Dog ? 'Edit' : 'Create'} psa</Button>
+              onChange={() => setFieldValue("isActive", !values.isActive)}
+              value={values.isActive}
+            /></View>
 
             <Button
               onPress={handleSubmit}
               mode="contained"
               style={styles.firstButton}
             >
-              {Dog ? "Edit" : "Create"} psa
+              {Dog ? "Zedytuj" : "Stwórz"} psa
             </Button>
           </View>
         )}

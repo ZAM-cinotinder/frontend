@@ -4,6 +4,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  
 } from "react-native";
 import { ref, set } from "firebase/database";
 import { useDatabaseValue } from "@react-query-firebase/database";
@@ -12,7 +13,7 @@ import { Text, View } from "../components/Themed";
 import { database } from "../constants/firebase";
 
 import { Button } from "react-native-paper";
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 import { useAuthentication } from "../hooks/useAuthentication";
 import TinderCard from "react-tinder-card";
@@ -21,29 +22,37 @@ import { SelectDogDialog } from "../components/SelectDogDialog";
 import { Dogs } from "../types/Dog";
 import { Message } from "../types/Message";
 
+import PSIE_ZARTY from "../components/jokes";
+
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { Picker } from "@react-native-picker/picker";
+import { vivodeships } from "../types/WOJEWODZTWA";
 
 // @ts-ignore
 export const SwipeDogsScreen = ({ navigation }) => {
   const { user } = useAuthentication();
-  const voivodeship = "Lodz";
+  const [voivodeship, setVoivodeship] = useState("Lodzkie");
   const swipable = useRef(null);
   const dbRef = ref(database, `Psy/${voivodeship}`);
-  const unfilteredDogs = useDatabaseValue<Dogs>(["Psy"], dbRef, {
+  const unfilteredDogs = useDatabaseValue<Dogs>(["Psy", voivodeship], dbRef, {
     subscribe: true,
   });
   const dogs = useMemo((): Dogs => {
     if (unfilteredDogs.data && user) {
       return Object.entries(unfilteredDogs.data)
-        .filter(([id, dog]) => dog.userId !== user!.uid)
+        .filter(([id, dog]) => dog.userId !== user!.uid && dog.isActive)
         .reduce((acc, [id, dog]) => ({ ...acc, [id]: dog }), {});
     }
     return {};
-  }, [unfilteredDogs.data, user?.uid]);
+  }, [unfilteredDogs.data, user?.uid, voivodeship]);
   const [currentIndex, setCurrentIndex] = useState("");
   const [selectDogDialogVisible, setSelectDogDialogVisible] = useState(false);
+
+  const zart = () => {
+    alert(PSIE_ZARTY[Math.floor(Math.random()*PSIE_ZARTY.length)]);
+  }
 
   const nextDog = () => {
     const lastArrayIndex = Object.keys(dogs).indexOf(currentIndex);
@@ -154,11 +163,30 @@ export const SwipeDogsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Picker
+        selectedValue={voivodeship}
+        onValueChange={(itemValue) => setVoivodeship(itemValue)}
+        style={styles.picker}
+      >
+        {vivodeships.map((vivodeship) => (
+          <Picker.Item label={vivodeship} value={vivodeship} key={vivodeship} />
+        ))}
+      </Picker>
       <SelectDogDialog
         onSelect={onDogSelect}
         onDismiss={onModalDismiss}
         visible={selectDogDialogVisible}
       />
+      {
+        !(Object.keys(dogs)?.length) && <View style={styles.dogCard}>
+          <Text style={styles.dogName}>
+            Chwilowy brak psów w {voivodeship}
+          </Text>
+          <Text style={styles.dogName}>
+            Spróbuj inne województwo!
+          </Text>
+        </View>
+      }
       {memoizedDogCard}
       <View style={buttonStyles.buttonPanel}>
         <View style={buttonStyles.upperButtonsContainer}>
@@ -175,13 +203,16 @@ export const SwipeDogsScreen = ({ navigation }) => {
             </LinearGradient>
           </TouchableWithoutFeedback>
 
+          <TouchableWithoutFeedback
+            onPress={zart}
+          >
           <LinearGradient
             colors={["#9747FF", "#00D2FF"]}
             style={buttonStyles.gradient}
             end={{ x: 0.2, y: 1 }}
           >
             <AntDesign name="star" size={26} color="#b3c6ff" />
-          </LinearGradient>
+          </LinearGradient></TouchableWithoutFeedback>
         </View>
 
         <View style={buttonStyles.bottomButtonsContainer}>
@@ -268,6 +299,9 @@ const styles = StyleSheet.create({
     left: "20%",
     zIndex: -1,
     opacity: 0.12,
+  },
+  picker: {
+    width: '100%',
   },
   dogImage: {
     width: "100%",
